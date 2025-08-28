@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Nazwy Pliku</title>
     <!-- Favicon link -->
-    <link rel="icon" type="image/png" href="/icon-32.png">
+    <link rel="icon" type="image/png" href="https://kwiecinski1.github.io/GNO/icon-32.png">
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="https://kwiecinski1.github.io/GNO/manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -46,6 +46,7 @@
         .border-gray-200-light { border-color: #e5e7eb; }
         .border-gray-300-light { border-color: #d1d5db; }
         .bg-gray-300-light { background-color: #d1d5db; }
+        .text-gray-800-icon-light { color: #1f2937; }
         
         /* Style dla trybu ciemnego */
         .bg-gray-800-dark { background-color: #1f2937; }
@@ -57,6 +58,12 @@
         .bg-gray-600-dark { background-color: #4b5563; }
         .border-gray-600-dark { border-color: #4b5563; }
         .shadow-lg-dark { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .text-gray-100-icon-dark { color: #f3f4f6; }
+        
+        /* Klasa dla efektu najechania w trybie ciemnym */
+        .hover\:bg-dark-circle:hover {
+            background-color: #384150;
+        }
 
     </style>
 </head>
@@ -65,12 +72,12 @@
     <div class="bg-white-light p-8 rounded-2xl shadow-lg w-full max-w-2xl border-2 border-gray-200-light" id="main-container">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800-light text-center" id="main-title">Generator Nazwy Pliku</h1>
-            <button id="mode-toggle" onclick="toggleDarkMode()" class="p-2 rounded-full text-gray-800-light hover:bg-gray-200 transition-colors duration-300">
-                <svg id="sun-icon" class="w-6 h-6 text-gray-800-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1m-16 0H3m15.364 6.364l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707-.707M6.343 17.657l-.707.707M16.97 12a4.998 4.998 0 01-1.414 3.536A5 5 0 0112 17a5 5 0 01-3.536-1.414A5 5 0 017 12a5 5 0 011.464-3.536 5 5 0 013.536-1.464A5 5 0 0117 12z"></path>
-                </svg>
-                <svg id="moon-icon" class="w-6 h-6 text-gray-800-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <button id="mode-toggle" onclick="toggleDarkMode()" class="p-2 rounded-full text-gray-800-icon-light hover:bg-gray-200 transition-colors duration-300">
+                <svg id="moon-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+                <svg id="sun-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1m-16 0H3m15.364 6.364l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707-.707M6.343 17.657l-.707.707M16.97 12a4.998 4.998 0 01-1.414 3.536A5 5 0 0112 17a5 5 0 01-3.536-1.414A5 5 0 017 12a5 5 0 011.464-3.536 5 5 0 013.536-1.464A5 5 0 0117 12z"></path>
                 </svg>
             </button>
         </div>
@@ -550,6 +557,7 @@
             const moonIcon = document.getElementById('moon-icon');
             const mainTitle = document.getElementById('main-title');
             const outputPreview = document.getElementById('output-preview');
+            const modeToggleButton = document.getElementById('mode-toggle');
 
             const isDarkMode = body.classList.contains('bg-gray-800-dark');
 
@@ -563,18 +571,14 @@
                 messageBox.classList.replace('bg-gray-800-dark', 'bg-white-light');
                 clearButton.classList.replace('bg-gray-600-dark', 'bg-gray-300-light');
                 clearButton.classList.replace('text-gray-100-dark', 'text-gray-800-light');
-                
+                modeToggleButton.classList.remove('text-gray-100-icon-dark', 'hover:bg-dark-circle');
+                modeToggleButton.classList.add('text-gray-800-icon-light', 'hover:bg-gray-200');
+
                 labels.forEach(label => label.classList.replace('text-gray-300-dark', 'text-gray-700-light'));
                 modeOptionSpans.forEach(span => span.classList.replace('text-gray-300-dark', 'text-gray-700-light'));
                 
-                // Zmieniamy kolory ikon na jasne
-                sunIcon.classList.remove('text-white');
-                sunIcon.classList.add('text-gray-800-light');
-                moonIcon.classList.remove('text-white');
-                moonIcon.classList.add('text-gray-800-light');
-
                 inputFields.forEach(input => {
-                    input.classList.remove('bg-gray-50-light', 'text-gray-800-light', 'bg-white-light', 'border-gray-300-light');
+                    input.classList.remove('bg-gray-700-dark', 'text-gray-100-dark', 'border-gray-600-dark');
                     input.classList.add('bg-white-light', 'text-gray-800-light', 'border-gray-300-light');
                 });
                 
@@ -584,6 +588,7 @@
                 historyList.classList.replace('bg-gray-700-dark', 'bg-white-light');
                 historyList.classList.replace('border-gray-600-dark', 'border-gray-300-light');
                 
+                // Show moon, hide sun
                 sunIcon.style.display = 'none';
                 moonIcon.style.display = 'inline';
             } else {
@@ -596,19 +601,14 @@
                 messageBox.classList.replace('bg-white-light', 'bg-gray-800-dark');
                 clearButton.classList.replace('bg-gray-300-light', 'bg-gray-600-dark');
                 clearButton.classList.replace('text-gray-800-light', 'text-gray-100-dark');
-
+                modeToggleButton.classList.remove('text-gray-800-icon-light', 'hover:bg-gray-200');
+                modeToggleButton.classList.add('text-gray-100-icon-dark', 'hover:bg-dark-circle');
 
                 labels.forEach(label => label.classList.replace('text-gray-700-light', 'text-gray-300-dark'));
                 modeOptionSpans.forEach(span => span.classList.replace('text-gray-700-light', 'text-gray-300-dark'));
                 
-                // Zmieniamy kolory ikon na białe
-                sunIcon.classList.remove('text-gray-800-light');
-                sunIcon.classList.add('text-white');
-                moonIcon.classList.remove('text-gray-800-light');
-                moonIcon.classList.add('text-white');
-
                 inputFields.forEach(input => {
-                    input.classList.remove('bg-gray-50-light', 'text-gray-800-light', 'bg-white-light', 'border-gray-300-light');
+                    input.classList.remove('bg-white-light', 'text-gray-800-light', 'border-gray-300-light');
                     input.classList.add('bg-gray-700-dark', 'text-gray-100-dark', 'border-gray-600-dark');
                 });
                 
@@ -618,17 +618,17 @@
                 historyList.classList.replace('bg-white-light', 'bg-gray-700-dark');
                 historyList.classList.replace('border-gray-300-light', 'border-gray-600-dark');
                 
-                sunIcon.style.display = 'none';
-                moonIcon.style.display = 'inline';
+                // Show sun, hide moon
+                sunIcon.style.display = 'inline';
+                moonIcon.style.display = 'none';
             }
         }
         
-        // Zmiana funkcji kopiowania, aby używała API Electrona
+        /**
+         * Copies text to the clipboard.
+         * @param {string} text - The text to copy.
+         */
         async function copyTextToClipboard(text) {
-             // W Electronie używamy `clipboard` z modułu `electron`,
-             // ale w tym przypadku korzystamy z `execCommand` z przeglądarki,
-             // ponieważ jesteśmy w Renderer Process. Jeśli działa, to jest ok.
-             // W przeciwnym razie można by użyć: `window.electron.copyText(text);`
              const textarea = document.createElement('textarea');
              textarea.value = text;
              document.body.appendChild(textarea);
@@ -648,6 +648,11 @@
             updateMode();
             updateCustomVersionField();
             updatePreview(); // Ensure the preview is updated on load with the current date
+            
+            // Check for dark mode preference and apply it
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                toggleDarkMode();
+            }
         };
 
     </script>
