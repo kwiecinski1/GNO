@@ -1,11 +1,11 @@
 const CACHE_NAME = 'generator-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-32.png',
-  '/icon-128.png',
-  '/icon-512.png',
+  'https://kwiecinski1.github.io/GNO/',
+  'https://kwiecinski1.github.io/GNO/index.html',
+  'https://kwiecinski1.github.io/GNO/manifest.json',
+  'https://kwiecinski1.github.io/GNO/icon-32.png',
+  'https://kwiecinski1.github.io/GNO/icon-128.png',
+  'https://kwiecinski1.github.io/GNO/icon-512.png',
   'https://cdn.tailwindcss.com',
 ];
 
