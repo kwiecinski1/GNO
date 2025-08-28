@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Nazwy Pliku</title>
+    <!-- Favicon link -->
+    <link rel="icon" type="image/png" href="/GeneratorPlikow/icon-32.png">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/GeneratorPlikow/manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -189,6 +193,19 @@
         </div>
 
     </div>
+
+    <!-- Skrypt do rejestracji Service Workera -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/GeneratorPlikow/service-worker.js').then(function(registration) {
+            console.log('Service Worker zarejestrowany pomyślnie.', registration.scope);
+          }, function(err) {
+            console.log('Rejestracja Service Worker nie powiodła się:', err);
+          });
+        });
+      }
+    </script>
 
     <script>
         // Słownik mapowania wyboru wersji
