@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Nazwy Pliku</title>
     <!-- Favicon link -->
-    <link rel="icon" type="image/png" href="/GeneratorPlikow/icon-32.png">
+    <link rel="icon" type="image/png" href="/icon-32.png">
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/GeneratorPlikow/manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -198,7 +198,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/GeneratorPlikow/service-worker.js').then(function(registration) {
+          navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
             console.log('Service Worker zarejestrowany pomyślnie.', registration.scope);
           }, function(err) {
             console.log('Rejestracja Service Worker nie powiodła się:', err);
@@ -301,7 +301,7 @@
                 parts.push(series);
 
                 if (ep_value) {
-                    parts.push(`ODC-${ep_value}`);
+                    parts.push(`ODC-${String(ep_value).padStart(3, '0')}`);
                 }
 
                 const subtitle = document.getElementById('subtitle').value.trim().toUpperCase();
@@ -384,7 +384,7 @@
                 if (mode === "standard" || mode === "season") {
                      const ep_input = document.getElementById('episode').value.trim();
                      if (ep_input && !/^\d+$/.test(ep_input)) {
-                         throw new Error("Numer odcinka musi być liczbą lub pozostawiony pusty.");
+                         throw new Error("Numer odcinka musi by\u0107 liczb\u0105 lub pozostawiony pusty.");
                      }
                      const preview = buildFilename(ep_input);
                      output_preview.value = preview;
@@ -416,7 +416,7 @@
                         showMessageBox("Nieprawidłowy format numerów odcinków!", "error");
                         return;
                     }
-                    const names = episodes.map(ep => buildFilename(String(ep)));
+                    const names = episodes.map(ep => buildFilename(String(ep).padStart(3, '0')));
                     const result_text = names.join("\n");
                     await copyTextToClipboard(result_text);
                     names.forEach(addHistoryItem);
@@ -574,7 +574,7 @@
                 moonIcon.classList.add('text-gray-800-light');
 
                 inputFields.forEach(input => {
-                    input.classList.remove('bg-gray-700-dark', 'text-gray-100-dark', 'border-gray-600-dark');
+                    input.classList.remove('bg-gray-50-light', 'text-gray-800-light', 'bg-white-light', 'border-gray-300-light');
                     input.classList.add('bg-white-light', 'text-gray-800-light', 'border-gray-300-light');
                 });
                 
@@ -618,8 +618,8 @@
                 historyList.classList.replace('bg-white-light', 'bg-gray-700-dark');
                 historyList.classList.replace('border-gray-300-light', 'border-gray-600-dark');
                 
-                sunIcon.style.display = 'inline';
-                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'inline';
             }
         }
         
@@ -647,6 +647,7 @@
             document.getElementById('date-input').value = `${year}-${month}-${day}`;
             updateMode();
             updateCustomVersionField();
+            updatePreview(); // Ensure the preview is updated on load with the current date
         };
 
     </script>
