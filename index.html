@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Nazwy Pliku</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Style dla trybu jasnego */
+        .bg-white-light { background-color: #ffffff; }
+        .bg-gray-50-light { background-color: #f9fafb; }
+        .text-gray-800-light { color: #1f2937; }
+        .bg-gray-100-light { background-color: #f3f4f6; }
+        .text-gray-700-light { color: #374151; }
+        .border-gray-200-light { border-color: #e5e7eb; }
+        .border-gray-300-light { border-color: #d1d5db; }
+        .bg-gray-300-light { background-color: #d1d5db; }
+        
+        /* Style dla trybu ciemnego */
+        .bg-gray-800-dark { background-color: #1f2937; }
+        .text-gray-100-dark { color: #f3f4f6; }
+        .text-gray-300-dark { color: #d1d5db; }
+        .bg-gray-900-dark { background-color: #111827; }
+        .border-gray-700-dark { border-color: #374151; }
+        .bg-gray-700-dark { background-color: #374151; }
+        .bg-gray-600-dark { background-color: #4b5563; }
+        .border-gray-600-dark { border-color: #4b5563; }
+        .shadow-lg-dark { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+
+    </style>
+</head>
+<body class="bg-gray-100-light p-6 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white-light p-8 rounded-2xl shadow-lg w-full max-w-2xl border-2 border-gray-200-light" id="main-container">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800-light text-center" id="main-title">Generator Nazwy Pliku</h1>
+            <button id="mode-toggle" onclick="toggleDarkMode()" class="p-2 rounded-full text-gray-800-light hover:bg-gray-200 transition-colors duration-300">
+                <svg id="sun-icon" class="w-6 h-6 text-gray-800-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1m-16 0H3m15.364 6.364l-.707.707M6.343 6.343l-.707-.707m12.728 0l-.707-.707M6.343 17.657l-.707.707M16.97 12a4.998 4.998 0 01-1.414 3.536A5 5 0 0112 17a5 5 0 01-3.536-1.414A5 5 0 017 12a5 5 0 011.464-3.536 5 5 0 013.536-1.464A5 5 0 0117 12z"></path>
+                </svg>
+                <svg id="moon-icon" class="w-6 h-6 text-gray-800-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Tryb pracy i opcje -->
+        <div class="mb-4 flex flex-col md:flex-row justify-between items-center md:items-start">
+            <div class="mb-4 md:mb-0">
+                <label class="block text-sm font-medium text-gray-700-light mb-2">Wybierz tryb:</label>
+                <div class="flex flex-wrap space-x-4" id="mode-options">
+                    <label class="flex items-center">
+                        <input type="radio" name="generation-mode" value="standard" class="form-radio text-blue-600 h-4 w-4" checked onchange="updateMode()">
+                        <span class="ml-2 text-gray-700-light">Odcinek</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="generation-mode" value="season" class="form-radio text-blue-600 h-4 w-4" onchange="updateMode()">
+                        <span class="ml-2 text-gray-700-light">Sezon</span>
+                    </label>
+                     <label class="flex items-center">
+                        <input type="radio" name="generation-mode" value="custom-single" class="form-radio text-blue-600 h-4 w-4" onchange="updateMode()">
+                        <span class="ml-2 text-gray-700-light">Niestandardowy</span>
+                    </label>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 md:mt-0">
+                <input type="checkbox" id="dash-toggle" checked onchange="updatePreview()" class="form-checkbox h-4 w-4 text-blue-600 rounded-md">
+                <label for="dash-toggle" class="text-sm font-medium text-gray-700-light">Spacje na myślniki</label>
+            </div>
+        </div>
+        
+
+        <!-- Formularz -->
+        <div id="standard-form" class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
+            <div class="md:col-span-2">
+                <label for="series" class="block text-sm font-medium text-gray-700-light">Nazwa serii:</label>
+                <input type="text" id="series" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+            </div>
+            <div class="md:col-span-2">
+                <label for="episode" id="episode-label" class="block text-sm font-medium text-gray-700-light">Numer odcinka:</label>
+                <input type="text" id="episode" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+            </div>
+            <div class="md:col-span-2">
+                <label for="subtitle" class="block text-sm font-medium text-gray-700-light">Podtytuł odcinka:</label>
+                <input type="text" id="subtitle" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+            </div>
+        </div>
+        
+        <div id="custom-single-form" class="hidden grid grid-cols-1 gap-y-4">
+             <div class="md:col-span-2">
+                <label for="custom-name" class="block text-sm font-medium text-gray-700-light">Nazwa niestandardowa:</label>
+                <input type="text" id="custom-name" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+            </div>
+        </div>
+
+        <!-- Pola wspólne -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 mt-6">
+            <div>
+                <label for="version-type" class="block text-sm font-medium text-gray-700-light">Rodzaj wersji:</label>
+                <select id="version-type" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" onchange="updateCustomVersionField(); updatePreview();">
+                    <option value="Emisja">Emisja</option>
+                    <option value="Kolaudacja">Kolaudacja</option>
+                    <option value="Wizja">Wizja</option>
+                    <option value="Radio">Radio</option>
+                    <option value="Niestandardowa">Niestandardowa</option>
+                </select>
+            </div>
+            <div id="custom-version-field" class="hidden">
+                <label for="custom-version-name" class="block text-sm font-medium text-gray-700-light">Nazwa niestandardowa:</label>
+                <input type="text" id="custom-version-name" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+            </div>
+            <div>
+                <label for="version-number" class="block text-sm font-medium text-gray-700-light">Numer wersji:</label>
+                <input type="number" id="version-number" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 md:col-span-2">
+                <div>
+                    <label for="date-input" class="block text-sm font-medium text-gray-700-light">Wybierz datę:</label>
+                    <input type="date" id="date-input" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                </div>
+                <div>
+                    <label for="date-format" class="block text-sm font-medium text-gray-700-light">Format daty:</label>
+                    <select id="date-format" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" onchange="updatePreview()">
+                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                        <option value="YY-MM-DD">YY-MM-DD</option>
+                        <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+                        <option value="DD-MM-YY">DD-MM-YY</option>
+                        <option value="MM-DD">MM-DD</option>
+                        <option value="DD-MM">DD-MM</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="md:col-span-2">
+                <label for="output-preview" class="block text-sm font-medium text-gray-700-light">Podgląd nazwy:</label>
+                <input type="text" id="output-preview" class="input-field mt-1 block w-full p-2 border rounded-md shadow-sm rounded-lg transition duration-200">
+            </div>
+        </div>
+
+        <!-- Przyciski -->
+        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 mt-6">
+            <button onclick="generateFilename()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300">Generuj i kopiuj</button>
+            <button onclick="copyDate()" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300">Kopiuj datę</button>
+            <button onclick="clearAll()" class="px-6 py-2 bg-gray-300-light text-gray-800-light font-semibold rounded-lg shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-300" id="clear-button">Wyczyść</button>
+        </div>
+        
+        <!-- Historia -->
+        <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700-light">Historia:</label>
+            <div id="history-list" class="mt-1 w-full bg-white-light border border-gray-300-light rounded-lg p-2 overflow-y-auto max-h-32 rounded-lg transition duration-200">
+                <!-- History items will be added here -->
+            </div>
+        </div>
+        
+        <!-- Custom Message Box -->
+        <div id="message-box" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+            <div class="bg-white-light p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
+                <p id="message-text" class="text-gray-800-light mb-4"></p>
+                <button onclick="closeMessageBox()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">OK</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Słownik mapowania wyboru wersji
+        const version_mapping = {
+            "Emisja": "EMISJA",
+            "Kolaudacja": "KOLAUD",
+            "Wizja": "WIZJA",
+            "Radio": "RADIO",
+            "Niestandardowa": "" // Niestandardowa jest pusta, ponieważ wartość pochodzi z innego pola
+        };
+        
+        // Słownik dostępnych formatów daty
+        const date_formats_options = {
+            "YYYY-MM-DD": (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+            "YY-MM-DD": (d) => `${String(d.getFullYear()).slice(-2)}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+            "DD-MM-YYYY": (d) => `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`,
+            "DD-MM-YY": (d) => `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getFullYear()).slice(-2)}`,
+            "MM-DD": (d) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+            "DD-MM": (d) => `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        };
+
+        /**
+         * Parses episode numbers from a string input.
+         * @param {string} text - The input string (e.g., "2-7", "2,3,5", "10").
+         * @returns {number[]} An array of episode numbers.
+         * @throws {Error} If the input format is invalid.
+         */
+        function parseEpisodeNumbers(text) {
+            text = text.trim();
+            if (text === "") {
+                return [];
+            }
+            if (text.includes('-')) {
+                const parts = text.split('-');
+                if (parts.length !== 2) {
+                    throw new Error("Przedział odcinków musi być w formacie 'początek-koniec'.");
+                }
+                const startStr = parts[0].trim();
+                const endStr = parts[1].trim();
+                if (!/^\d+$/.test(startStr) || !/^\d+$/.test(endStr)) {
+                    throw new Error("Oba numery w przedziale muszą być liczbami.");
+                }
+                const start = parseInt(startStr);
+                const end = parseInt(endStr);
+                if (start > end) {
+                    throw new Error("Początkowy numer musi być mniejszy lub równy końcowemu.");
+                }
+                const result = [];
+                for (let i = start; i <= end; i++) {
+                    result.push(i);
+                }
+                return result;
+            } else if (text.includes(',')) {
+                const parts = text.split(',');
+                const result = [];
+                for (const p of parts) {
+                    const cleanP = p.trim();
+                    if (!/^\d+$/.test(cleanP)) {
+                        throw new Error("Wszystkie numery muszą być liczbami.");
+                    }
+                    result.push(parseInt(cleanP));
+                }
+                return result;
+            } else {
+                if (!/^\d+$/.test(text)) {
+                    throw new Error("Podaj numer odcinka lub przedział, np. '2-7' lub '2,3,5'.");
+                }
+                return [parseInt(text)];
+            }
+        }
+
+        /**
+         * Builds a single filename based on the current form values.
+         * @param {string | number} ep_value - The episode number.
+         * @returns {string} The generated filename.
+         * @throws {Error} If required fields are missing or invalid.
+         */
+        function buildFilename(ep_value) {
+            const mode = document.querySelector('input[name="generation-mode"]:checked').value;
+            const parts = [];
+
+            if (mode === "custom-single") {
+                 const customName = document.getElementById('custom-name').value.trim().toUpperCase();
+                if (!customName) {
+                    throw new Error("Nazwa niestandardowa jest wymagana.");
+                }
+                parts.push(customName);
+            } else { // standard and season mode
+                const series = document.getElementById('series').value.trim().toUpperCase();
+                if (!series) {
+                    throw new Error("Nazwa serii jest wymagana.");
+                }
+                parts.push(series);
+
+                if (ep_value) {
+                    parts.push(`ODC-${ep_value}`);
+                }
+
+                const subtitle = document.getElementById('subtitle').value.trim().toUpperCase();
+                if (subtitle) {
+                    parts.push(subtitle);
+                }
+            }
+            
+
+            const v_choice = document.getElementById('version-type').value;
+            let version_type = "";
+            if (v_choice === "Niestandardowa") {
+                version_type = document.getElementById('custom-version-name').value.trim().toUpperCase();
+                if (!version_type) {
+                     throw new Error("Nazwa niestandardowa jest wymagana dla tej wersji.");
+                }
+            } else {
+                version_type = version_mapping[v_choice] || "";
+            }
+
+            const version_number_input = document.getElementById('version-number').value.trim();
+            if (version_number_input) {
+                if (!/^\d+$/.test(version_number_input)) {
+                    throw new Error("Numer wersji musi być liczbą lub pozostawiony pusty.");
+                }
+                if (version_type) {
+                    parts.push(`${version_type}-${version_number_input}`);
+                }
+            } else {
+                if(version_type) {
+                     parts.push(version_type);
+                }
+            }
+
+            const date_input = document.getElementById('date-input').value;
+            if (!date_input) {
+                throw new Error("Data jest wymagana.");
+            }
+            const chosen_date = new Date(date_input);
+            const selected_format = document.getElementById('date-format').value;
+            const date_formatter = date_formats_options[selected_format];
+            const date_str = date_formatter(chosen_date);
+            parts.push(date_str);
+
+            let filename = parts.join("_");
+
+            // Replace spaces with hyphens if the toggle is checked
+            const useDashes = document.getElementById('dash-toggle').checked;
+            if (useDashes) {
+                filename = filename.replace(/ /g, '-');
+            }
+
+            return filename;
+        }
+
+        /**
+         * Shows a custom message box.
+         * @param {string} message - The message to display.
+         * @param {string} type - "success" or "error".
+         */
+        function showMessageBox(message, type) {
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            messageText.textContent = message;
+            messageBox.style.display = 'flex';
+        }
+
+        function closeMessageBox() {
+            document.getElementById('message-box').style.display = 'none';
+        }
+
+        /**
+         * Updates the filename preview based on the current form values.
+         */
+        function updatePreview() {
+            try {
+                const mode = document.querySelector('input[name="generation-mode"]:checked').value;
+                const output_preview = document.getElementById('output-preview');
+
+                if (mode === "standard" || mode === "season") {
+                     const ep_input = document.getElementById('episode').value.trim();
+                     if (ep_input && !/^\d+$/.test(ep_input)) {
+                         throw new Error("Numer odcinka musi być liczbą lub pozostawiony pusty.");
+                     }
+                     const preview = buildFilename(ep_input);
+                     output_preview.value = preview;
+                } else if (mode === "custom-single") {
+                    const preview = buildFilename();
+                    output_preview.value = preview;
+                }
+
+            } catch (e) {
+                document.getElementById('output-preview').value = "";
+            }
+        }
+
+        /**
+         * Generates the filename(s) and copies to clipboard.
+         */
+        async function generateFilename() {
+            const mode = document.querySelector('input[name="generation-mode"]:checked').value;
+            const ep_input = document.getElementById('episode').value.trim();
+            
+            if (mode === "season") {
+                if (!ep_input) {
+                    showMessageBox("Podaj numery odcinków!", "error");
+                    return;
+                }
+                try {
+                    const episodes = parseEpisodeNumbers(ep_input);
+                    if (!episodes || episodes.length === 0) {
+                        showMessageBox("Nieprawidłowy format numerów odcinków!", "error");
+                        return;
+                    }
+                    const names = episodes.map(ep => buildFilename(String(ep)));
+                    const result_text = names.join("\n");
+                    await copyTextToClipboard(result_text);
+                    names.forEach(addHistoryItem);
+                    showMessageBox("Nazwy plików zostały wygenerowane i skopiowane do schowka!", "success");
+                } catch (e) {
+                    showMessageBox("Błąd: " + e.message, "error");
+                }
+            } else { // standard and custom-single mode
+                const fname = document.getElementById('output-preview').value;
+                if (!fname) {
+                    showMessageBox("Nieprawidłowe dane wejściowe!", "error");
+                    return;
+                }
+                try {
+                    await copyTextToClipboard(fname);
+                    addHistoryItem(fname);
+                    showMessageBox("Nazwa pliku została wygenerowana i skopiowana do schowka!", "success");
+                } catch (e) {
+                    showMessageBox("Błąd: " + e.message, "error");
+                }
+            }
+        }
+        
+        /**
+         * Copies the formatted date to the clipboard.
+         */
+        async function copyDate() {
+            try {
+                const date_input = document.getElementById('date-input').value;
+                if (!date_input) {
+                    showMessageBox("Błąd: Data nie jest wybrana.", "error");
+                    return;
+                }
+                const chosen_date = new Date(date_input);
+                const selected_format = document.getElementById('date-format').value;
+                const date_formatter = date_formats_options[selected_format];
+                const date_str = date_formatter(chosen_date);
+                
+                await copyTextToClipboard(date_str);
+                showMessageBox("Data została skopiowana do schowka!", "success");
+            } catch (e) {
+                showMessageBox("Błąd podczas kopiowania daty: " + e.message, "error");
+            }
+        }
+
+        /**
+         * Clears all form inputs and the history.
+         */
+        function clearAll() {
+            document.getElementById('series').value = "";
+            document.getElementById('episode').value = "";
+            document.getElementById('subtitle').value = "";
+            document.getElementById('custom-name').value = "";
+            document.getElementById('custom-version-name').value = "";
+            document.getElementById('version-number').value = "";
+            document.getElementById('output-preview').value = "";
+            document.getElementById('history-list').innerHTML = "";
+            document.getElementById('version-type').value = "Emisja";
+            document.getElementById('date-format').value = "YYYY-MM-DD";
+            document.querySelector('input[name="generation-mode"][value="standard"]').checked = true;
+            updateMode();
+            updateCustomVersionField();
+        }
+
+        /**
+         * Adds a generated filename to the history list.
+         * @param {string} name - The filename to add.
+         */
+        function addHistoryItem(name) {
+            const historyList = document.getElementById('history-list');
+            const newDiv = document.createElement('div');
+            newDiv.textContent = name;
+            newDiv.className = 'history-item p-1 border-b last:border-b-0 break-all';
+            historyList.appendChild(newDiv);
+        }
+
+        /**
+         * Updates the UI based on the selected mode.
+         */
+        function updateMode() {
+            const mode = document.querySelector('input[name="generation-mode"]:checked').value;
+            const standardForm = document.getElementById('standard-form');
+            const customSingleForm = document.getElementById('custom-single-form');
+            const episodeLabel = document.getElementById('episode-label');
+            const subtitleInput = document.getElementById('subtitle');
+            
+            if (mode === "standard") {
+                standardForm.classList.remove('hidden');
+                customSingleForm.classList.add('hidden');
+                episodeLabel.textContent = "Numer odcinka:";
+                subtitleInput.readOnly = false;
+            } else if (mode === "custom-single") {
+                standardForm.classList.add('hidden');
+                customSingleForm.classList.remove('hidden');
+            } else if (mode === "season") {
+                standardForm.classList.remove('hidden');
+                customSingleForm.classList.add('hidden');
+                episodeLabel.textContent = "Numery odcinków (np. 1-5 lub 1,3,5):";
+                 subtitleInput.readOnly = true;
+            }
+            updatePreview();
+        }
+
+        /**
+         * Shows/hides the custom version name input field.
+         */
+        function updateCustomVersionField() {
+            const versionType = document.getElementById('version-type').value;
+            const customField = document.getElementById('custom-version-field');
+            if (versionType === "Niestandardowa") {
+                customField.classList.remove('hidden');
+            } else {
+                customField.classList.add('hidden');
+            }
+        }
+        
+        /**
+         * Toggles between light and dark mode.
+         */
+        function toggleDarkMode() {
+            const body = document.body;
+            const container = document.getElementById('main-container');
+            const labels = document.querySelectorAll('label');
+            const inputFields = document.querySelectorAll('.input-field');
+            const modeOptions = document.getElementById('mode-options');
+            const modeOptionSpans = modeOptions.querySelectorAll('span');
+            const historyList = document.getElementById('history-list');
+            const messageBox = document.getElementById('message-box').querySelector('div');
+            const clearButton = document.getElementById('clear-button');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            const mainTitle = document.getElementById('main-title');
+            const outputPreview = document.getElementById('output-preview');
+
+            const isDarkMode = body.classList.contains('bg-gray-800-dark');
+
+            if (isDarkMode) {
+                // Switch to light mode
+                body.classList.replace('bg-gray-800-dark', 'bg-gray-100-light');
+                container.classList.replace('bg-gray-900-dark', 'bg-white-light');
+                container.classList.replace('border-gray-700-dark', 'border-gray-200-light');
+                container.classList.remove('shadow-lg-dark');
+                mainTitle.classList.replace('text-gray-100-dark', 'text-gray-800-light');
+                messageBox.classList.replace('bg-gray-800-dark', 'bg-white-light');
+                clearButton.classList.replace('bg-gray-600-dark', 'bg-gray-300-light');
+                clearButton.classList.replace('text-gray-100-dark', 'text-gray-800-light');
+                
+                labels.forEach(label => label.classList.replace('text-gray-300-dark', 'text-gray-700-light'));
+                modeOptionSpans.forEach(span => span.classList.replace('text-gray-300-dark', 'text-gray-700-light'));
+                
+                // Zmieniamy kolory ikon na jasne
+                sunIcon.classList.remove('text-white');
+                sunIcon.classList.add('text-gray-800-light');
+                moonIcon.classList.remove('text-white');
+                moonIcon.classList.add('text-gray-800-light');
+
+                inputFields.forEach(input => {
+                    input.classList.remove('bg-gray-700-dark', 'text-gray-100-dark', 'border-gray-600-dark');
+                    input.classList.add('bg-white-light', 'text-gray-800-light', 'border-gray-300-light');
+                });
+                
+                outputPreview.classList.remove('bg-gray-600-dark', 'text-gray-100-dark', 'border-gray-600-dark');
+                outputPreview.classList.add('bg-gray-50-light', 'text-gray-800-light', 'border-gray-300-light');
+                
+                historyList.classList.replace('bg-gray-700-dark', 'bg-white-light');
+                historyList.classList.replace('border-gray-600-dark', 'border-gray-300-light');
+                
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'inline';
+            } else {
+                // Switch to dark mode
+                body.classList.replace('bg-gray-100-light', 'bg-gray-800-dark');
+                container.classList.replace('bg-white-light', 'bg-gray-900-dark');
+                container.classList.replace('border-gray-200-light', 'border-gray-700-dark');
+                container.classList.add('shadow-lg-dark');
+                mainTitle.classList.replace('text-gray-800-light', 'text-gray-100-dark');
+                messageBox.classList.replace('bg-white-light', 'bg-gray-800-dark');
+                clearButton.classList.replace('bg-gray-300-light', 'bg-gray-600-dark');
+                clearButton.classList.replace('text-gray-800-light', 'text-gray-100-dark');
+
+
+                labels.forEach(label => label.classList.replace('text-gray-700-light', 'text-gray-300-dark'));
+                modeOptionSpans.forEach(span => span.classList.replace('text-gray-700-light', 'text-gray-300-dark'));
+                
+                // Zmieniamy kolory ikon na białe
+                sunIcon.classList.remove('text-gray-800-light');
+                sunIcon.classList.add('text-white');
+                moonIcon.classList.remove('text-gray-800-light');
+                moonIcon.classList.add('text-white');
+
+                inputFields.forEach(input => {
+                    input.classList.remove('bg-gray-50-light', 'text-gray-800-light', 'bg-white-light', 'border-gray-300-light');
+                    input.classList.add('bg-gray-700-dark', 'text-gray-100-dark', 'border-gray-600-dark');
+                });
+                
+                outputPreview.classList.remove('bg-gray-50-light', 'text-gray-800-light', 'border-gray-300-light');
+                outputPreview.classList.add('bg-gray-600-dark', 'text-gray-100-dark', 'border-gray-600-dark');
+                
+                historyList.classList.replace('bg-white-light', 'bg-gray-700-dark');
+                historyList.classList.replace('border-gray-300-light', 'border-gray-600-dark');
+                
+                sunIcon.style.display = 'inline';
+                moonIcon.style.display = 'none';
+            }
+        }
+        
+        // Zmiana funkcji kopiowania, aby używała API Electrona
+        async function copyTextToClipboard(text) {
+             // W Electronie używamy `clipboard` z modułu `electron`,
+             // ale w tym przypadku korzystamy z `execCommand` z przeglądarki,
+             // ponieważ jesteśmy w Renderer Process. Jeśli działa, to jest ok.
+             // W przeciwnym razie można by użyć: `window.electron.copyText(text);`
+             const textarea = document.createElement('textarea');
+             textarea.value = text;
+             document.body.appendChild(textarea);
+             textarea.select();
+             document.execCommand('copy');
+             document.body.removeChild(textarea);
+         }
+
+
+        // Set initial date to today and update UI
+        window.onload = function() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('date-input').value = `${year}-${month}-${day}`;
+            updateMode();
+            updateCustomVersionField();
+        };
+
+    </script>
+</body>
+</html>
