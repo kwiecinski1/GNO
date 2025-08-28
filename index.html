@@ -52,6 +52,7 @@
         .bg-gray-800-dark { background-color: #1f2937; }
         .text-gray-100-dark { color: #f3f4f6; }
         .text-gray-300-dark { color: #d1d5db; }
+        .text-white-dark { color: #ffffff; }
         .bg-gray-900-dark { background-color: #111827; }
         .border-gray-700-dark { border-color: #374151; }
         .bg-gray-700-dark { background-color: #374151; }
@@ -186,7 +187,7 @@
         <!-- Historia -->
         <div class="mt-6">
             <label class="block text-sm font-medium text-gray-700-light">Historia:</label>
-            <div id="history-list" class="mt-1 w-full bg-white-light border border-gray-300-light rounded-lg p-2 overflow-y-auto max-h-32 rounded-lg transition duration-200">
+            <div id="history-list" class="mt-1 w-full bg-white-light border border-gray-300-light rounded-lg p-2 overflow-y-auto max-h-32 rounded-lg transition duration-200 text-gray-800-light">
                 <!-- History items will be added here -->
             </div>
         </div>
@@ -308,7 +309,7 @@
                 parts.push(series);
 
                 if (ep_value) {
-                    parts.push(`ODC-${String(ep_value).padStart(3, '0')}`);
+                    parts.push(`ODC-${ep_value}`);
                 }
 
                 const subtitle = document.getElementById('subtitle').value.trim().toUpperCase();
@@ -423,7 +424,7 @@
                         showMessageBox("Nieprawidłowy format numerów odcinków!", "error");
                         return;
                     }
-                    const names = episodes.map(ep => buildFilename(String(ep).padStart(3, '0')));
+                    const names = episodes.map(ep => buildFilename(ep));
                     const result_text = names.join("\n");
                     await copyTextToClipboard(result_text);
                     names.forEach(addHistoryItem);
@@ -552,6 +553,7 @@
             const modeOptionSpans = modeOptions.querySelectorAll('span');
             const historyList = document.getElementById('history-list');
             const messageBox = document.getElementById('message-box').querySelector('div');
+            const messageText = document.getElementById('message-text');
             const clearButton = document.getElementById('clear-button');
             const sunIcon = document.getElementById('sun-icon');
             const moonIcon = document.getElementById('moon-icon');
@@ -569,6 +571,8 @@
                 container.classList.remove('shadow-lg-dark');
                 mainTitle.classList.replace('text-gray-100-dark', 'text-gray-800-light');
                 messageBox.classList.replace('bg-gray-800-dark', 'bg-white-light');
+                messageText.classList.replace('text-white-dark', 'text-gray-800-light');
+                historyList.classList.replace('text-white-dark', 'text-gray-800-light');
                 clearButton.classList.replace('bg-gray-600-dark', 'bg-gray-300-light');
                 clearButton.classList.replace('text-gray-100-dark', 'text-gray-800-light');
                 modeToggleButton.classList.remove('text-gray-100-icon-dark', 'hover:bg-dark-circle');
@@ -599,6 +603,8 @@
                 container.classList.add('shadow-lg-dark');
                 mainTitle.classList.replace('text-gray-800-light', 'text-gray-100-dark');
                 messageBox.classList.replace('bg-white-light', 'bg-gray-800-dark');
+                messageText.classList.replace('text-gray-800-light', 'text-white-dark');
+                historyList.classList.replace('text-gray-800-light', 'text-white-dark');
                 clearButton.classList.replace('bg-gray-300-light', 'bg-gray-600-dark');
                 clearButton.classList.replace('text-gray-800-light', 'text-gray-100-dark');
                 modeToggleButton.classList.remove('text-gray-800-icon-light', 'hover:bg-gray-200');
