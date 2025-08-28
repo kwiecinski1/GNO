@@ -1,0 +1,21 @@
+{
+  "name": "Generator Nazw Plików",
+  "short_name": "Generator",
+  "description": "Narzędzie do generowania i kopiowania nazw plików multimedialnych.",
+  "start_url": "/GeneratorPlikow/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "icons": [
+    {
+      "src": "/GeneratorPlikow/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/GeneratorPlikow/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }
+  ]
+}
