@@ -2,23 +2,23 @@
   "name": "Generator Nazw Plików",
   "short_name": "Generator",
   "description": "Narzędzie do generowania i kopiowania nazw plików multimedialnych.",
-  "start_url": "/",
+  "start_url": "https://kwiecinski1.github.io/GNO/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1f2937",
   "icons": [
     {
-      "src": "/icon-32.png",
+      "src": "https://kwiecinski1.github.io/GNO/icon-32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/icon-128.png",
+      "src": "https://kwiecinski1.github.io/GNO/icon-128.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://kwiecinski1.github.io/GNO/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
