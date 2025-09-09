@@ -82,6 +82,12 @@
                 </svg>
             </button>
         </div>
+
+        <!-- NOWA SEKCJA: Pole do wklejania nazwy -->
+        <div class="mb-6">
+            <label for="paste-area" class="block text-sm font-medium text-gray-700-light">Wklej nazwę, aby wypełnić formularz:</label>
+            <input type="text" id="paste-area" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" placeholder="np. MK16_ODC-13_KOLAUD-1_2025-09-04" oninput="parseAndFillForm(this.value)">
+        </div>
         
         <!-- Tryb pracy i opcje -->
         <div class="mb-4 flex flex-col md:flex-row justify-between items-center md:items-start">
@@ -108,7 +114,6 @@
             </div>
         </div>
         
-
         <!-- Formularz -->
         <div id="standard-form" class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
             <div class="md:col-span-2">
@@ -223,6 +228,14 @@
             "Wizja": "WIZJA",
             "Radio": "RADIO",
             "Niestandardowa": "" // Niestandardowa jest pusta, ponieważ wartość pochodzi z innego pola
+        };
+
+        // NOWY SŁOWNIK: Odwrócone mapowanie do parsowania
+        const reverse_version_mapping = {
+            "EMISJA": "Emisja",
+            "KOLAUD": "Kolaudacja",
+            "WIZJA": "Wizja",
+            "RADIO": "Radio"
         };
         
         // Słownik dostępnych formatów daty
@@ -391,10 +404,11 @@
 
                 if (mode === "standard" || mode === "season") {
                      const ep_input = document.getElementById('episode').value.trim();
-                     if (ep_input && !/^\d+$/.test(ep_input)) {
+                     if (ep_input && !/^\d+$/.test(ep_input.split('-')[0].split(',')[0])) { // Check first number in sequence
                          throw new Error("Numer odcinka musi by\u0107 liczb\u0105 lub pozostawiony pusty.");
                      }
-                     const preview = buildFilename(ep_input);
+                     const preview_ep = ep_input.split('-')[0].split(',')[0]; // Use first number for preview
+                     const preview = buildFilename(preview_ep);
                      output_preview.value = preview;
                 } else if (mode === "custom-single") {
                     const preview = buildFilename();
@@ -481,6 +495,7 @@
             document.getElementById('custom-version-name').value = "";
             document.getElementById('version-number').value = "";
             document.getElementById('output-preview').value = "";
+            document.getElementById('paste-area').value = "";
             document.getElementById('history-list').innerHTML = "";
             document.getElementById('version-type').value = "Emisja";
             document.getElementById('date-format').value = "YYYY-MM-DD";
@@ -642,6 +657,86 @@
              document.execCommand('copy');
              document.body.removeChild(textarea);
          }
+
+        // NOWA FUNKCJA: Parsuje nazwę pliku i wypełnia formularz
+        /**
+         * Parses a filename string and fills the form fields accordingly.
+         * @param {string} filename - The filename string to parse.
+         */
+        function parseAndFillForm(filename) {
+            if (!filename) return;
+
+            // Reset części formularza przed wypełnieniem
+            document.getElementById('series').value = "";
+            document.getElementById('episode').value = "";
+            document.getElementById('subtitle').value = "";
+            document.getElementById('custom-name').value = "";
+            document.getElementById('version-number').value = "";
+            document.getElementById('custom-version-name').value = "";
+            document.getElementById('version-type').value = "Emisja";
+
+            let parts = filename.split('_');
+
+            // Krok 1: Analiza daty (zawsze na końcu)
+            const datePart = parts.pop();
+            if (datePart) {
+                // Prosta heurystyka do rozpoznawania formatu i ustawienia daty
+                if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+                    document.getElementById('date-input').value = datePart;
+                    document.getElementById('date-format').value = "YYYY-MM-DD";
+                } else if (/^\d{2}-\d{2}-\d{2}$/.test(datePart)) {
+                    document.getElementById('date-input').value = `20${datePart}`;
+                    document.getElementById('date-format').value = "YY-MM-DD";
+                } // Można dodać więcej reguł dla innych formatów
+            }
+
+            // Krok 2: Analiza wersji (teraz na końcu)
+            const versionPart = parts.pop();
+            if (versionPart) {
+                const versionDetails = versionPart.split('-');
+                const versionTypeName = versionDetails[0];
+                const versionNumber = versionDetails.length > 1 ? versionDetails[1] : "";
+
+                if (reverse_version_mapping[versionTypeName]) {
+                    document.getElementById('version-type').value = reverse_version_mapping[versionTypeName];
+                } else {
+                    document.getElementById('version-type').value = "Niestandardowa";
+                    document.getElementById('custom-version-name').value = versionTypeName.replace(/-/g, ' ');
+                }
+                document.getElementById('version-number').value = versionNumber;
+            }
+
+            // Krok 3: Analiza reszty (seria, odcinek, podtytuł)
+            let isEpisodeMode = false;
+            let episodeIndex = -1;
+
+            parts.forEach((part, index) => {
+                if (part.startsWith('ODC-')) {
+                    isEpisodeMode = true;
+                    episodeIndex = index;
+                    const epNumber = part.substring(4);
+                    document.getElementById('episode').value = epNumber;
+                }
+            });
+
+            if (isEpisodeMode) {
+                document.querySelector('input[name="generation-mode"][value="standard"]').checked = true;
+                const seriesParts = parts.slice(0, episodeIndex);
+                const subtitleParts = parts.slice(episodeIndex + 1);
+
+                document.getElementById('series').value = seriesParts.join(' ').replace(/-/g, ' ');
+                document.getElementById('subtitle').value = subtitleParts.join(' ').replace(/-/g, ' ');
+
+            } else {
+                document.querySelector('input[name="generation-mode"][value="custom-single"]').checked = true;
+                document.getElementById('custom-name').value = parts.join(' ').replace(/-/g, ' ');
+            }
+
+            // Krok 4: Odświeżenie UI
+            updateMode();
+            updateCustomVersionField();
+            updatePreview();
+        }
 
 
         // Set initial date to today and update UI
