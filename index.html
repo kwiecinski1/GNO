@@ -83,10 +83,10 @@
             </button>
         </div>
 
-        <!-- NOWA SEKCJA: Pole do wklejania nazwy -->
+        <!-- ZMIANA: Usunięto placeholder -->
         <div class="mb-6">
             <label for="paste-area" class="block text-sm font-medium text-gray-700-light">Wklej nazwę, aby wypełnić formularz:</label>
-            <input type="text" id="paste-area" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" placeholder="np. MK16_ODC-13_KOLAUD-1_2025-09-04" oninput="parseAndFillForm(this.value)">
+            <input type="text" id="paste-area" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="parseAndFillForm(this.value)">
         </div>
         
         <!-- Tryb pracy i opcje -->
@@ -178,7 +178,7 @@
             
             <div class="md:col-span-2">
                 <label for="output-preview" class="block text-sm font-medium text-gray-700-light">Podgląd nazwy:</label>
-                <input type="text" id="output-preview" class="input-field mt-1 block w-full p-2 border rounded-md shadow-sm rounded-lg transition duration-200">
+                <input type="text" id="output-preview" class="input-field mt-1 block w-full p-2 border rounded-md shadow-sm rounded-lg transition duration-200" readonly>
             </div>
         </div>
 
@@ -230,7 +230,7 @@
             "Niestandardowa": "" // Niestandardowa jest pusta, ponieważ wartość pochodzi z innego pola
         };
 
-        // NOWY SŁOWNIK: Odwrócone mapowanie do parsowania
+        // Odwrócone mapowanie do parsowania
         const reverse_version_mapping = {
             "EMISJA": "Emisja",
             "KOLAUD": "Kolaudacja",
@@ -658,13 +658,12 @@
              document.body.removeChild(textarea);
          }
 
-        // NOWA FUNKCJA: Parsuje nazwę pliku i wypełnia formularz
         /**
          * Parses a filename string and fills the form fields accordingly.
          * @param {string} filename - The filename string to parse.
          */
         function parseAndFillForm(filename) {
-            if (!filename) return;
+            if (!filename || filename.trim() === '') return;
 
             // Reset części formularza przed wypełnieniem
             document.getElementById('series').value = "";
@@ -736,6 +735,9 @@
             updateMode();
             updateCustomVersionField();
             updatePreview();
+            
+            // ZMIANA: Wyczyść pole po udanym wklejeniu
+            document.getElementById('paste-area').value = '';
         }
 
 
