@@ -66,14 +66,30 @@
             background-color: #384150;
         }
 
+        .panel-surface {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+        }
+        .muted-copy {
+            color: #374151;
+        }
+        body.bg-gray-800-dark .panel-surface {
+            background-color: #1f2937;
+            border-color: #374151;
+        }
+        body.bg-gray-800-dark .muted-copy {
+            color: #d1d5db;
+        }
     </style>
 </head>
 <body class="bg-gray-100-light p-6 min-h-screen flex items-center justify-center">
 
-    <div class="bg-white-light p-8 rounded-2xl shadow-lg w-full max-w-2xl border-2 border-gray-200-light" id="main-container">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800-light text-center" id="main-title">Generator Nazwy Pliku</h1>
-            <button id="mode-toggle" onclick="toggleDarkMode()" class="p-2 rounded-full text-gray-800-icon-light hover:bg-gray-200 transition-colors duration-300">
+    <div class="bg-white-light p-6 md:p-8 rounded-3xl shadow-lg w-full max-w-4xl border-2 border-gray-200-light" id="main-container">
+        <div class="flex justify-between items-start mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800-light" id="main-title">Generator Nazwy Pliku</h1>
+            </div>
+            <button id="mode-toggle" onclick="toggleDarkMode()" class="p-2 rounded-full text-gray-800-icon-light hover:bg-gray-200 transition-colors duration-300 shrink-0">
                 <svg id="moon-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                 </svg>
@@ -83,89 +99,94 @@
             </button>
         </div>
 
-        <!-- ZMIANA: Usunięto placeholder -->
-        <div class="mb-6">
-            <label for="paste-area" class="block text-sm font-medium text-gray-700-light">Wklej nazwę, aby wypełnić formularz:</label>
-            <input type="text" id="paste-area" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="parseAndFillForm(this.value)">
+        <div class="panel-surface rounded-2xl p-4 md:p-5 mb-5">
+            <label for="paste-area" class="block text-sm font-semibold text-gray-700-light">Wklej nazwę, aby wypełnić formularz:</label>
+            <input type="text" id="paste-area" class="input-field mt-2 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="parseAndFillForm(this.value)">
         </div>
-        
-        <!-- Tryb pracy i opcje -->
-        <div class="mb-4 flex flex-col md:flex-row justify-between items-center md:items-start">
-            <div class="mb-4 md:mb-0">
-                <label class="block text-sm font-medium text-gray-700-light mb-2">Wybierz tryb:</label>
-                <div class="flex flex-wrap space-x-4" id="mode-options">
-                    <label class="flex items-center">
-                        <input type="radio" name="generation-mode" value="standard" class="form-radio text-blue-600 h-4 w-4" checked onchange="updateMode()">
-                        <span class="ml-2 text-gray-700-light">Odcinek</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="radio" name="generation-mode" value="season" class="form-radio text-blue-600 h-4 w-4" onchange="updateMode()">
-                        <span class="ml-2 text-gray-700-light">Sezon</span>
-                    </label>
-                     <label class="flex items-center">
-                        <input type="radio" name="generation-mode" value="custom-single" class="form-radio text-blue-600 h-4 w-4" onchange="updateMode()">
-                        <span class="ml-2 text-gray-700-light">Niestandardowy</span>
+
+        <div class="panel-surface rounded-2xl p-4 md:p-5 mb-5">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700-light mb-2">Wybierz tryb:</label>
+                    <div class="flex flex-wrap gap-x-5 gap-y-2" id="mode-options">
+                        <label class="flex items-center">
+                            <input type="radio" name="generation-mode" value="standard" class="form-radio text-blue-600 h-4 w-4" checked onchange="updateMode()">
+                            <span class="ml-2 text-gray-700-light">Odcinek</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="generation-mode" value="season" class="form-radio text-blue-600 h-4 w-4" onchange="updateMode()">
+                            <span class="ml-2 text-gray-700-light">Sezon</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="generation-mode" value="custom-single" class="form-radio text-blue-600 h-4 w-4" onchange="updateMode()">
+                            <span class="ml-2 text-gray-700-light">Niestandardowy</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex items-center lg:justify-end lg:pt-7">
+                    <label for="dash-toggle" class="inline-flex items-center text-sm font-medium text-gray-700-light">
+                        <input type="checkbox" id="dash-toggle" checked onchange="updatePreview()" class="form-checkbox h-4 w-4 text-blue-600 rounded-md">
+                        <span class="ml-2">Spacje na myślniki</span>
                     </label>
                 </div>
-            </div>
-            <div class="flex items-center space-x-2 md:mt-0">
-                <input type="checkbox" id="dash-toggle" checked onchange="updatePreview()" class="form-checkbox h-4 w-4 text-blue-600 rounded-md">
-                <label for="dash-toggle" class="text-sm font-medium text-gray-700-light">Spacje na myślniki</label>
-            </div>
-        </div>
-        
-        <!-- Formularz -->
-        <div id="standard-form" class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
-            <div class="md:col-span-2">
-                <label for="series" class="block text-sm font-medium text-gray-700-light">Nazwa serii:</label>
-                <input type="text" id="series" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
-            </div>
-            <div class="md:col-span-2">
-                <label for="episode" id="episode-label" class="block text-sm font-medium text-gray-700-light">Numer odcinka:</label>
-                <input type="text" id="episode" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
-            </div>
-            <div class="md:col-span-2">
-                <label for="subtitle" class="block text-sm font-medium text-gray-700-light">Podtytuł odcinka:</label>
-                <input type="text" id="subtitle" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
-            </div>
-        </div>
-        
-        <div id="custom-single-form" class="hidden grid grid-cols-1 gap-y-4">
-             <div class="md:col-span-2">
-                <label for="custom-name" class="block text-sm font-medium text-gray-700-light">Nazwa niestandardowa:</label>
-                <input type="text" id="custom-name" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
             </div>
         </div>
 
-        <!-- Pola wspólne -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 mt-6">
-            <div>
-                <label for="version-type" class="block text-sm font-medium text-gray-700-light">Rodzaj wersji:</label>
-                <select id="version-type" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" onchange="updateCustomVersionField(); updatePreview();">
-                    <option value="Emisja">Emisja</option>
-                    <option value="Kolaudacja">Kolaudacja</option>
-                    <option value="Wizja">Wizja</option>
-                    <option value="Radio">Radio</option>
-                    <option value="Niestandardowa">Niestandardowa</option>
-                </select>
+        <div class="panel-surface rounded-2xl p-4 md:p-5 mb-5">
+            <div id="standard-form" class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-4 items-end">
+                <div>
+                    <label for="series" class="block text-sm font-medium text-gray-700-light">Nazwa serii:</label>
+                    <input type="text" id="series" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                </div>
+                <div class="md:justify-self-start">
+                    <label for="episode" id="episode-label" class="block text-sm font-medium text-gray-700-light">Numer odcinka:</label>
+                    <input type="text" id="episode" class="input-field mt-1 block w-[190px] max-w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="subtitle" class="block text-sm font-medium text-gray-700-light">Podtytuł odcinka:</label>
+                    <input type="text" id="subtitle" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                </div>
             </div>
-            <div id="custom-version-field" class="hidden">
-                <label for="custom-version-name" class="block text-sm font-medium text-gray-700-light">Nazwa niestandardowa:</label>
-                <input type="text" id="custom-version-name" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+
+            <div id="custom-single-form" class="hidden grid grid-cols-1 gap-4">
+                <div>
+                    <label for="custom-name" class="block text-sm font-medium text-gray-700-light">Nazwa niestandardowa:</label>
+                    <input type="text" id="custom-name" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                </div>
             </div>
-            <div>
-                <label for="version-number" class="block text-sm font-medium text-gray-700-light">Numer wersji:</label>
-                <input type="number" id="version-number" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 md:col-span-2">
+        </div>
+
+        <div class="panel-surface rounded-2xl p-4 md:p-5 mb-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="version-type" class="block text-sm font-medium text-gray-700-light">Rodzaj wersji:</label>
+                    <select id="version-type" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" onchange="updateCustomVersionField(); updatePreview();">
+                        <option value="Emisja">Emisja</option>
+                        <option value="Kolaudacja">Kolaudacja</option>
+                        <option value="Wizja">Wizja</option>
+                        <option value="Radio">Radio</option>
+                        <option value="Proste v">Proste v</option>
+                        <option value="Niestandardowa">Niestandardowa</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="version-number" class="block text-sm font-medium text-gray-700-light">Numer wersji:</label>
+                    <input type="number" id="version-number" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                </div>
+
+                <div id="custom-version-field" class="hidden md:col-span-2">
+                    <label for="custom-version-name" class="block text-sm font-medium text-gray-700-light">Nazwa niestandardowa:</label>
+                    <input type="text" id="custom-version-name" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                </div>
+
                 <div>
                     <label for="date-input" class="block text-sm font-medium text-gray-700-light">Wybierz datę:</label>
-                    <input type="date" id="date-input" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
+                    <input type="date" id="date-input" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" oninput="updatePreview()">
                 </div>
                 <div>
                     <label for="date-format" class="block text-sm font-medium text-gray-700-light">Format daty:</label>
-                    <select id="date-format" class="input-field mt-1 block w-full p-2 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" onchange="updatePreview()">
+                    <select id="date-format" class="input-field mt-1 block w-full p-2.5 border border-gray-300-light rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200" onchange="updatePreview()">
                         <option value="YYYY-MM-DD">YYYY-MM-DD</option>
                         <option value="YY-MM-DD">YY-MM-DD</option>
                         <option value="DD-MM-YYYY">DD-MM-YYYY</option>
@@ -174,25 +195,32 @@
                         <option value="DD-MM">DD-MM</option>
                     </select>
                 </div>
-            </div>
-            
-            <div class="md:col-span-2">
-                <label for="output-preview" class="block text-sm font-medium text-gray-700-light">Podgląd nazwy:</label>
-                <input type="text" id="output-preview" class="input-field mt-1 block w-full p-2 border rounded-md shadow-sm rounded-lg transition duration-200" readonly>
+
+                <div class="md:col-span-2">
+                    <label class="inline-flex items-center text-sm text-gray-700-light">
+                        <input type="checkbox" id="overwrite-date-toggle" checked onchange="updatePreview()" class="form-checkbox h-4 w-4 text-blue-600 rounded-md">
+                        <span class="ml-2">Nadpisz datę dzisiejszą</span>
+                    </label>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="output-preview" class="block text-sm font-medium text-gray-700-light">Podgląd nazwy:</label>
+                    <input type="text" id="output-preview" class="input-field mt-1 block w-full p-2.5 border rounded-md shadow-sm rounded-lg transition duration-200" readonly>
+                </div>
             </div>
         </div>
 
         <!-- Przyciski -->
-        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 mt-6">
+        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 mt-2">
             <button onclick="generateFilename()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300">Generuj i kopiuj</button>
             <button onclick="copyDate()" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300">Kopiuj datę</button>
             <button onclick="clearAll()" class="px-6 py-2 bg-gray-300-light text-gray-800-light font-semibold rounded-lg shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-300" id="clear-button">Wyczyść</button>
         </div>
         
         <!-- Historia -->
-        <div class="mt-6">
-            <label class="block text-sm font-medium text-gray-700-light">Historia:</label>
-            <div id="history-list" class="mt-1 w-full bg-white-light border border-gray-300-light rounded-lg p-2 overflow-y-auto max-h-32 rounded-lg transition duration-200 text-gray-800-light">
+        <div class="mt-6 panel-surface rounded-2xl p-4 md:p-5">
+            <label class="block text-sm font-semibold text-gray-700-light">Historia:</label>
+            <div id="history-list" class="mt-2 w-full bg-white-light border border-gray-300-light rounded-lg p-2 overflow-y-auto max-h-32 rounded-lg transition duration-200 text-gray-800-light">
                 <!-- History items will be added here -->
             </div>
         </div>
@@ -227,6 +255,7 @@
             "Kolaudacja": "KOLAUD",
             "Wizja": "WIZJA",
             "Radio": "RADIO",
+            "Proste v": "v",
             "Niestandardowa": "" // Niestandardowa jest pusta, ponieważ wartość pochodzi z innego pola
         };
 
@@ -235,8 +264,24 @@
             "EMISJA": "Emisja",
             "KOLAUD": "Kolaudacja",
             "WIZJA": "Wizja",
-            "RADIO": "Radio"
+            "RADIO": "Radio",
+            "v": "Proste v"
         };
+
+        function getTodayIsoDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function sanitizePastedFilename(filename) {
+            return filename
+                .replace(/\.copy\.(0[1-9]|[1-9][0-9])$/i, '')
+                .replace(/\scopy(?:\s\d+)?$/i, '')
+                .trim();
+        }
         
         // Słownik dostępnych formatów daty
         const date_formats_options = {
@@ -334,6 +379,7 @@
 
             const v_choice = document.getElementById('version-type').value;
             let version_type = "";
+            const isSimpleVVersion = v_choice === "Proste v";
             if (v_choice === "Niestandardowa") {
                 version_type = document.getElementById('custom-version-name').value.trim().toUpperCase();
                 if (!version_type) {
@@ -349,7 +395,7 @@
                     throw new Error("Numer wersji musi być liczbą lub pozostawiony pusty.");
                 }
                 if (version_type) {
-                    parts.push(`${version_type}-${version_number_input}`);
+                    parts.push(isSimpleVVersion ? `${version_type}${version_number_input}` : `${version_type}-${version_number_input}`);
                 }
             } else {
                 if(version_type) {
@@ -499,6 +545,8 @@
             document.getElementById('history-list').innerHTML = "";
             document.getElementById('version-type').value = "Emisja";
             document.getElementById('date-format').value = "YYYY-MM-DD";
+            document.getElementById('overwrite-date-toggle').checked = true;
+            document.getElementById('date-input').value = getTodayIsoDate();
             document.querySelector('input[name="generation-mode"][value="standard"]').checked = true;
             updateMode();
             updateCustomVersionField();
@@ -665,6 +713,9 @@
         function parseAndFillForm(filename) {
             if (!filename || filename.trim() === '') return;
 
+            const cleanedFilename = sanitizePastedFilename(filename.trim());
+            if (!cleanedFilename) return;
+
             // Reset części formularza przed wypełnieniem
             document.getElementById('series').value = "";
             document.getElementById('episode').value = "";
@@ -674,11 +725,12 @@
             document.getElementById('custom-version-name').value = "";
             document.getElementById('version-type').value = "Emisja";
 
-            let parts = filename.split('_');
+            let parts = cleanedFilename.split('_');
+            const shouldOverwriteDateWithToday = document.getElementById('overwrite-date-toggle').checked;
 
             // Krok 1: Analiza daty (zawsze na końcu)
             const datePart = parts.pop();
-            if (datePart) {
+            if (datePart && !shouldOverwriteDateWithToday) {
                 // Prosta heurystyka do rozpoznawania formatu i ustawienia daty
                 if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
                     document.getElementById('date-input').value = datePart;
@@ -692,17 +744,23 @@
             // Krok 2: Analiza wersji (teraz na końcu)
             const versionPart = parts.pop();
             if (versionPart) {
-                const versionDetails = versionPart.split('-');
-                const versionTypeName = versionDetails[0];
-                const versionNumber = versionDetails.length > 1 ? versionDetails[1] : "";
-
-                if (reverse_version_mapping[versionTypeName]) {
-                    document.getElementById('version-type').value = reverse_version_mapping[versionTypeName];
+                const simpleVMatch = versionPart.match(/^v(\d+)$/);
+                if (simpleVMatch) {
+                    document.getElementById('version-type').value = "Proste v";
+                    document.getElementById('version-number').value = simpleVMatch[1];
                 } else {
-                    document.getElementById('version-type').value = "Niestandardowa";
-                    document.getElementById('custom-version-name').value = versionTypeName.replace(/-/g, ' ');
+                    const versionDetails = versionPart.split('-');
+                    const versionTypeName = versionDetails[0];
+                    const versionNumber = versionDetails.length > 1 ? versionDetails[1] : "";
+
+                    if (reverse_version_mapping[versionTypeName]) {
+                        document.getElementById('version-type').value = reverse_version_mapping[versionTypeName];
+                    } else {
+                        document.getElementById('version-type').value = "Niestandardowa";
+                        document.getElementById('custom-version-name').value = versionTypeName.replace(/-/g, ' ');
+                    }
+                    document.getElementById('version-number').value = versionNumber;
                 }
-                document.getElementById('version-number').value = versionNumber;
             }
 
             // Krok 3: Analiza reszty (seria, odcinek, podtytuł)
@@ -743,11 +801,8 @@
 
         // Set initial date to today and update UI
         window.onload = function() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            document.getElementById('date-input').value = `${year}-${month}-${day}`;
+            document.getElementById('overwrite-date-toggle').checked = true;
+            document.getElementById('date-input').value = getTodayIsoDate();
             updateMode();
             updateCustomVersionField();
             updatePreview(); // Ensure the preview is updated on load with the current date
